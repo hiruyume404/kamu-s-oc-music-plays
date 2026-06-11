@@ -3,39 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>水晶玻璃風 OC 迷你播放器 (透明與明暗適應版)</title>
+    <title>水晶玻璃風 OC 迷你播放器 (極簡自適應版)</title>
     <!-- 使用 Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* 定義系統明暗自適應的 CSS 變數 */
+        /* 系統明暗自適應變量 - 調配得更溫柔、更極簡 */
         :root {
-            /* 預設深色模式 (Dark Mode) */
+            /* 深色模式 */
             --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.5);
-            --card-bg: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.22);
-            --button-bg: rgba(255, 255, 255, 0.08);
-            --button-hover: rgba(255, 255, 255, 0.16);
-            --progress-bg: rgba(255, 255, 255, 0.1);
-            --glass-shine: rgba(255, 255, 255, 0.25);
-            --cog-color: rgba(255, 255, 255, 0.2);
-            --cog-hover: rgba(255, 255, 255, 0.75);
+            --text-secondary: rgba(255, 255, 255, 0.45);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --button-bg: rgba(255, 255, 255, 0.06);
+            --progress-bg: rgba(255, 255, 255, 0.08);
+            --cog-color: rgba(255, 255, 255, 0.18);
+            --cog-hover: rgba(255, 255, 255, 0.6);
         }
 
         @media (prefers-color-scheme: light) {
             :root {
-                /* 自動轉換為淺色模式 (Light Mode) */
-                --text-primary: #0f172a; /* Slate 900 */
-                --text-secondary: rgba(15, 23, 42, 0.6);
-                --card-bg: rgba(15, 23, 42, 0.06);
-                --card-border: rgba(15, 23, 42, 0.16);
-                --button-bg: rgba(15, 23, 42, 0.06);
-                --button-hover: rgba(15, 23, 42, 0.12);
-                --progress-bg: rgba(15, 23, 42, 0.08);
-                --glass-shine: rgba(15, 23, 42, 0.15);
-                --cog-color: rgba(15, 23, 42, 0.3);
-                --cog-hover: rgba(15, 23, 42, 0.8);
+                /* 淺色模式 */
+                --text-primary: #1e293b; /* Slate 800 */
+                --text-secondary: rgba(30, 41, 59, 0.55);
+                --card-bg: rgba(30, 41, 59, 0.04);
+                --card-border: rgba(30, 41, 59, 0.1);
+                --button-bg: rgba(30, 41, 59, 0.05);
+                --progress-bg: rgba(30, 41, 59, 0.06);
+                --cog-color: rgba(30, 41, 59, 0.22);
+                --cog-hover: rgba(30, 41, 59, 0.7);
             }
         }
 
@@ -49,127 +45,97 @@
         .pause-vinyl {
             animation-play-state: paused;
         }
-        
-        /* 水晶鏡面高光斜線 (隨明暗模式變化折射高光色) */
-        .glass-highlight::after {
-            content: '';
-            position: absolute;
-            top: -150%;
-            left: -150%;
-            width: 300%;
-            height: 300%;
-            background: linear-gradient(
-                115deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0) 40%,
-                var(--glass-shine) 48%,
-                rgba(255, 255, 255, 0.35) 50%,
-                var(--glass-shine) 52%,
-                rgba(255, 255, 255, 0) 60%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(0deg);
-            pointer-events: none;
-            transition: all 0.6s ease;
-        }
-        .glass-highlight:hover::after {
-            transform: translate(10%, 10%);
-        }
 
-        /* 自訂滾動條 */
+        /* 隱藏滾動條 */
         ::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body class="text-slate-100 flex items-center justify-center min-h-screen p-4 select-none transition-colors duration-500 overflow-hidden bg-slate-950">
 
-    <!-- 編輯狀態時的動態背景漸層光暈 (嵌入模式下會自動隱藏，確保絕對透明) -->
+    <!-- 動態背景微弱漸層光暈 (已大幅調低透明度，極致簡約不突兀) -->
     <div id="auraContainer" class="absolute inset-0 overflow-hidden pointer-events-none">
-        <div id="auraBg1" class="absolute -right-20 -bottom-20 w-96 h-96 rounded-full blur-[110px] opacity-35 transition-all duration-1000" style="background-color: var(--accent-color, #38bdf8);"></div>
-        <div id="auraBg2" class="absolute -left-20 -top-20 w-96 h-96 rounded-full blur-[110px] opacity-30 transition-all duration-1000" style="background-color: var(--vinyl-color, #fda4af);"></div>
+        <div id="auraBg1" class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full blur-[120px] opacity-15 transition-all duration-1000" style="background-color: var(--accent-color, #38bdf8);"></div>
+        <div id="auraBg2" class="absolute -left-20 -top-20 w-80 h-80 rounded-full blur-[120px] opacity-12 transition-all duration-1000" style="background-color: var(--vinyl-color, #fda4af);"></div>
     </div>
 
-    <!-- 播放器主卡片 (極致通透水晶玻璃 - 邊框/底色隨系統明暗自動調整) -->
-    <div id="playerContainer" class="glass-highlight w-full max-w-[360px] rounded-[24px] p-4.5 backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex items-center gap-4 transition-all duration-300 relative z-10 overflow-hidden"
-         style="background-color: var(--card-bg); border: 1.5px solid var(--card-border);">
+    <!-- 播放器主卡片 (去背通透水晶 - 更加扁平簡約) -->
+    <div id="playerContainer" class="w-full max-w-[350px] rounded-[20px] p-4 backdrop-blur-2xl shadow-[0_12px_40px_rgba(0,0,0,0.25)] flex items-center gap-3.5 transition-all duration-300 relative z-10 overflow-hidden"
+         style="background-color: var(--card-bg); border: 1px solid var(--card-border);">
         
         <!-- 彩色黑膠唱片盤面 -->
-        <div class="relative flex-shrink-0 cursor-pointer group/vinyl" id="vinylWrapper">
+        <div class="relative flex-shrink-0 cursor-pointer" id="vinylWrapper">
             <!-- 唱片主體 (外圈彩色黑膠溝槽) -->
-            <div id="vinylDisc" class="w-18 h-18 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.4)] relative flex items-center justify-center transition-all duration-500 animate-vinyl pause-vinyl" 
-                 style="background: radial-gradient(circle, rgba(0,0,0,0.85) 30%, var(--vinyl-color, #fda4af) 70%, rgba(0,0,0,0.95) 100%);">
+            <div id="vinylDisc" class="w-16 h-16 rounded-full shadow-[0_6px_15px_rgba(0,0,0,0.3)] relative flex items-center justify-center transition-all duration-500 animate-vinyl pause-vinyl" 
+                 style="background: radial-gradient(circle, rgba(0,0,0,0.85) 35%, var(--vinyl-color, #fda4af) 75%, rgba(0,0,0,0.95) 100%);">
                 
                 <!-- 唱片微細溝槽紋路 (SVG 疊加) -->
-                <div class="absolute inset-0 rounded-full opacity-35" style="background: repeating-radial-gradient(circle, transparent, transparent 2px, rgba(255,255,255,0.1) 3px, rgba(0,0,0,0.2) 4px);"></div>
+                <div class="absolute inset-0 rounded-full opacity-30" style="background: repeating-radial-gradient(circle, transparent, transparent 2px, rgba(255,255,255,0.08) 3px, rgba(0,0,0,0.15) 4px);"></div>
 
-                <!-- 唱片中心專輯封面 (本地上傳圖片顯示處) -->
-                <div class="w-10 h-10 rounded-full overflow-hidden relative z-10 border border-black/30 shadow-inner">
+                <!-- 唱片中心專輯封面 (直接上傳圖片) -->
+                <div class="w-9 h-9 rounded-full overflow-hidden relative z-10 border border-black/30 shadow-inner">
                     <img id="trackCover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=150" 
                          class="w-full h-full object-cover" alt="Cover">
                 </div>
 
                 <!-- 黑膠唱片中心軸孔 -->
-                <div class="absolute inset-0 m-auto w-3 h-3 bg-slate-950 rounded-full border border-white/25 z-20 flex items-center justify-center shadow-inner">
-                    <div class="w-0.75 h-0.75 bg-white/90 rounded-full"></div>
+                <div class="absolute inset-0 m-auto w-2.5 h-2.5 bg-slate-950 rounded-full border border-white/25 z-20 flex items-center justify-center shadow-inner">
+                    <div class="w-0.5 h-0.5 bg-white/90 rounded-full"></div>
                 </div>
             </div>
             
-            <!-- 播放時的波紋呼吸環 -->
-            <div id="pulseRing" class="absolute -inset-1.5 rounded-full border-2 border-transparent pointer-events-none transition-all duration-700 scale-100 opacity-0"></div>
+            <!-- 播放時的極簡波紋環 -->
+            <div id="pulseRing" class="absolute -inset-1 rounded-full border border-transparent pointer-events-none transition-all duration-700 scale-100 opacity-0"></div>
         </div>
 
-        <!-- 播放器控制與文字區 (樣式與顏色隨系統明暗自動調整) -->
-        <div class="flex-1 min-w-0 flex flex-col justify-between h-[72px]">
+        <!-- 播放器控制與文字區 -->
+        <div class="flex-1 min-w-0 flex flex-col justify-between h-[64px]">
             <div class="truncate pr-4">
-                <h3 id="trackTitle" class="text-sm font-semibold truncate tracking-wide filter drop-shadow-sm transition-colors duration-300" style="color: var(--text-primary);">OC 印象曲名稱</h3>
-                <p id="trackArtist" class="text-xs truncate mt-0.5 tracking-wider transition-colors duration-300" style="color: var(--text-secondary);">角色名 / 歌手</p>
+                <h3 id="trackTitle" class="text-xs font-semibold truncate tracking-wide transition-colors duration-300" style="color: var(--text-primary);">OC 印象曲名稱</h3>
+                <p id="trackArtist" class="text-[11px] truncate mt-0.5 tracking-wider transition-colors duration-300" style="color: var(--text-secondary);">角色名 / 歌手</p>
             </div>
             
-            <div class="flex items-center justify-between gap-3 mt-1.5">
-                <!-- 播放暫停鈕 (顏色跟隨點綴色，襯底與邊框隨系統明暗自適應) -->
-                <button id="playBtn" class="w-8 h-8 rounded-full flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm hover:shadow-md transition-all duration-300" 
+            <div class="flex items-center justify-between gap-2.5 mt-1">
+                <!-- 播放暫停鈕 -->
+                <button id="playBtn" class="w-7 h-7 rounded-full flex items-center justify-center transition active:scale-90 cursor-pointer shadow-sm transition-all duration-300" 
                         style="color: var(--accent-color, #38bdf8); background-color: var(--button-bg); border: 1px solid var(--card-border);">
-                    <i class="fas fa-play text-xs translate-x-[1px]" id="playIcon"></i>
+                    <i class="fas fa-play text-[10px] translate-x-[0.5px]" id="playIcon"></i>
                 </button>
                 
                 <!-- 進度條容器 -->
-                <div class="flex-1 py-2.5 cursor-pointer" id="progressContainer">
+                <div class="flex-1 py-2 cursor-pointer" id="progressContainer">
                     <div class="h-1 rounded-full overflow-hidden relative shadow-inner" style="background-color: var(--progress-bg);">
                         <div id="progressBar" class="h-full rounded-full transition-all duration-100" style="width: 0%; background-color: var(--accent-color, #38bdf8);"></div>
                     </div>
                 </div>
                 
                 <!-- 時間顯示 -->
-                <span id="timeDisplay" class="text-[10px] font-mono tracking-tighter w-8 text-right transition-colors duration-300" style="color: var(--text-secondary);">00:00</span>
+                <span id="timeDisplay" class="text-[9px] font-mono tracking-tighter w-7 text-right transition-colors duration-300" style="color: var(--text-secondary);">00:00</span>
             </div>
         </div>
 
         <!-- HTML5 音頻主件 -->
         <audio id="audioSource" src=""></audio>
 
-        <!-- 水晶隱形設定鈕 (預設隨系統明暗變更，Hover 時浮現) -->
-        <button id="toggleEditBtn" class="absolute top-2.5 right-2.5 text-[10px] transition-all duration-300 w-6 h-6 rounded-full bg-white/0 hover:bg-white/10 border border-transparent flex items-center justify-center cursor-pointer z-30"
+        <!-- 齒輪設定鈕 -->
+        <button id="toggleEditBtn" class="absolute top-2 right-2 text-[9px] transition-all duration-300 w-5 h-5 rounded-full bg-white/0 hover:bg-white/10 flex items-center justify-center cursor-pointer z-30"
                 style="color: var(--cog-color);">
             <i class="fas fa-cog"></i>
         </button>
     </div>
 
     <!-- 隱藏的圖片壓縮 Canvas 引擎 -->
-    <canvas id="compressCanvas" class="hidden"></canvas>
+    <canvas id="compressCanvas" style="display: none !important;"></canvas>
 
-    <!-- 編輯設定面板 (此面板始終保持精緻黑底毛玻璃，確保編輯時辨識度最高) -->
+    <!-- 編輯設定面板 (此面板在嵌入 Notion 時會被物理刪除，100% 防止字樣漏出) -->
     <div id="editPanel" class="fixed inset-y-4 right-4 w-80 bg-slate-950/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-5 shadow-[0_25px_60px_rgba(0,0,0,0.6)] z-50 transform translate-x-[340px] opacity-0 transition-all duration-500 ease-out hidden flex-col">
         <div class="flex justify-between items-center pb-3 border-b border-white/10">
             <h3 class="font-bold tracking-wider flex items-center gap-1.5" style="color: var(--accent-color, #38bdf8);">
@@ -238,7 +204,7 @@
                     </div>
                 </div>
 
-                <!-- GitHub 同目錄偵測 (最推薦) -->
+                <!-- GitHub 同目錄偵測 -->
                 <div id="audioGithubContainer" class="space-y-2">
                     <div class="bg-slate-900/60 border border-white/10 rounded-xl p-3 space-y-2">
                         <div class="flex items-center gap-2">
@@ -248,7 +214,7 @@
                             </button>
                         </div>
                         <p class="text-[9px] text-slate-400 leading-normal">
-                            💡 將 MP3 重新命名為簡單的英文 (例如 <code class="text-sky-300">music.mp3</code>) 上傳到跟此網頁相同的 GitHub 資料夾，點選偵測即可一秒取得直鏈！
+                            💡 將 MP3 命名為 <code class="text-sky-300">music.mp3</code> 上傳至相同 GitHub 資料夾下，點擊偵測即可！
                         </p>
                     </div>
                     <!-- 顯示目前偵測到的網址狀態 -->
@@ -294,12 +260,12 @@
     </div>
 
     <script>
-        // 初始化自訂色彩與全域變數
+        // 初始化色調與全局變數
         let accentColor = '#38bdf8';
         let vinylColor = '#fda4af';
-        let compressedCoverBase64 = ''; // 儲存智慧壓縮後的封面圖像 Base64
-        let currentAudioMode = 'github'; // 'github' 或 'upload'
-        let githubAudioUrl = '';        // 自動生成的 GitHub 同儲存庫音訊網址
+        let compressedCoverBase64 = ''; 
+        let currentAudioMode = 'github'; 
+        let githubAudioUrl = '';        
 
         // 取得 DOM 節點
         const audio = document.getElementById('audioSource');
@@ -332,7 +298,7 @@
         const colorHex = document.getElementById('colorHex');
         const vinylColorHex = document.getElementById('vinylColorHex');
 
-        // 音訊與 GitHub 特化節點
+        // 音訊與 GitHub 節點
         const tabGithubBtn = document.getElementById('tabGithubBtn');
         const tabUploadBtn = document.getElementById('tabUploadBtn');
         const audioGithubContainer = document.getElementById('audioGithubContainer');
@@ -350,6 +316,7 @@
         // Toast 訊息框
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
+            if (!toast) return; // 如果在嵌入模式下被刪除了就不顯示
             const toastIcon = document.getElementById('toastIcon');
             const toastMsg = document.getElementById('toastMsg');
 
@@ -392,7 +359,7 @@
         tabGithubBtn.addEventListener('click', () => setAudioMode('github'));
         tabUploadBtn.addEventListener('click', () => setAudioMode('upload'));
 
-        // 自動偵測同倉庫音樂直鏈 (GitHub 特化技術)
+        // 自動偵測同倉庫音樂直鏈 (GitHub 部署技術)
         detectAudioBtn.addEventListener('click', () => {
             const filename = inputAudioFilename.value.trim();
             if (!filename) {
@@ -400,17 +367,14 @@
                 return;
             }
 
-            // 抓取當前頁面部署後的 URL 路徑並組合
             const currentUrl = window.location.href.split('?')[0].split('#')[0];
             const lastSlashIndex = currentUrl.lastIndexOf('/');
             const resolvedUrl = currentUrl.substring(0, lastSlashIndex + 1) + filename;
 
-            // 更新預覽並顯示
             githubAudioUrl = resolvedUrl;
             detectedUrlText.textContent = resolvedUrl;
             detectedUrlDisplay.classList.remove('hidden');
 
-            // 立即測試載入音軌
             audio.src = resolvedUrl;
             audio.load();
 
@@ -433,8 +397,8 @@
                 auraBg2.style.backgroundColor = vinyl;
             }
 
-            // 黑膠背景動態重繪
-            vinylDisc.style.background = `radial-gradient(circle, rgba(0,0,0,0.85) 30%, ${vinyl} 70%, rgba(0,0,0,0.95) 100%)`;
+            // 黑膠背景重繪
+            vinylDisc.style.background = `radial-gradient(circle, rgba(0,0,0,0.85) 35%, ${vinyl} 75%, rgba(0,0,0,0.95) 100%)`;
 
             // 同步設定欄位的值
             inputColor.value = accent;
@@ -447,7 +411,7 @@
         inputColor.addEventListener('input', (e) => updateColors(e.target.value, vinylColor));
         inputVinylColor.addEventListener('input', (e) => updateColors(accentColor, e.target.value));
 
-        // 預設特鹽風按鈕設定
+        // 預設快速設定
         document.querySelectorAll('.theme-preset-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const accent = btn.getAttribute('data-accent');
@@ -456,7 +420,7 @@
             });
         });
 
-        // 智慧圖片上傳、裁切與壓縮 (120x120px)
+        // 智慧圖片裁切壓縮
         inputCoverFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -495,7 +459,7 @@
             reader.readAsDataURL(file);
         });
 
-        // 本機音訊快播測試機制
+        // 本地音訊預聽
         inputAudioFile.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -505,10 +469,10 @@
             audioNameDisplay.textContent = `🎵 快聽：${file.name}`;
             audioNameDisplay.classList.remove('hidden');
             audioUploadStatus.textContent = '本機音檔載入成功';
-            showToast("本地暫存測試音檔已就緒，可以開始播放！");
+            showToast("本地測試音檔已就緒！");
         });
 
-        // 播放與暫停切換
+        // 播放與暫停控制
         playBtn.addEventListener('click', togglePlay);
         vinylWrapper.addEventListener('click', togglePlay);
 
@@ -521,7 +485,7 @@
             if (audio.paused) {
                 audio.play()
                     .then(() => {
-                        playIcon.className = 'fas fa-pause text-xs';
+                        playIcon.className = 'fas fa-pause text-[10px]';
                         vinylDisc.classList.remove('pause-vinyl');
                         pulseRing.classList.remove('opacity-0', 'scale-100');
                         pulseRing.classList.add('opacity-100', 'scale-110');
@@ -529,11 +493,11 @@
                     })
                     .catch(err => {
                         console.error(err);
-                        showToast("播放失敗！請確認檔案已部署至 GitHub，且格式無損。", "error");
+                        showToast("播放失敗！請確認檔案已部署至 GitHub 且無 CORS 阻擋。", "error");
                     });
             } else {
                 audio.pause();
-                playIcon.className = 'fas fa-play text-xs translate-x-[1px]';
+                playIcon.className = 'fas fa-play text-[10px] translate-x-[0.5px]';
                 vinylDisc.classList.add('pause-vinyl');
                 pulseRing.classList.remove('opacity-100', 'scale-110');
                 pulseRing.classList.add('opacity-0', 'scale-100');
@@ -553,7 +517,7 @@
             }
         });
 
-        // 點擊/觸控進度條跳轉
+        // 點擊/觸控跳轉進度
         function setProgress(e) {
             const width = progressContainer.clientWidth;
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -585,7 +549,7 @@
 
         // 播放終了重置
         audio.addEventListener('ended', () => {
-            playIcon.className = 'fas fa-play text-xs translate-x-[1px]';
+            playIcon.className = 'fas fa-play text-[10px] translate-x-[0.5px]';
             vinylDisc.classList.add('pause-vinyl');
             pulseRing.classList.remove('opacity-100', 'scale-110');
             pulseRing.classList.add('opacity-0', 'scale-100');
@@ -593,15 +557,19 @@
             timeDisplay.textContent = '00:00';
         });
 
-        // 控制面板開啟與關閉
-        toggleEditBtn.addEventListener('click', () => {
-            if (editPanel.classList.contains('hidden')) {
-                openSettings();
-            } else {
-                closeSettings();
-            }
-        });
-        closePanelBtn.addEventListener('click', closeSettings);
+        // 設定面板控制
+        if (toggleEditBtn) {
+            toggleEditBtn.addEventListener('click', () => {
+                if (editPanel.classList.contains('hidden')) {
+                    openSettings();
+                } else {
+                    closeSettings();
+                }
+            });
+        }
+        if (closePanelBtn) {
+            closePanelBtn.addEventListener('click', closeSettings);
+        }
 
         function openSettings() {
             editPanel.classList.remove('hidden');
@@ -617,26 +585,32 @@
             }, 500);
         }
 
-        // 解析 URL 參數並還原 OC 資料 (體貼處理 Notion 透明背景去背)
+        // 解析並還原資料
         function loadUrlParams() {
             const params = new URLSearchParams(window.location.search);
             const embedMode = params.get('embed') === 'true';
             
             if (embedMode) {
-                // 100% 透明去背模式啟動！
-                toggleEditBtn.classList.add('hidden');
+                // 1. 隱藏編輯設定鈕，body 100% 透明去背
+                if (toggleEditBtn) toggleEditBtn.remove();
                 document.body.classList.remove('bg-slate-950');
                 document.body.classList.add('bg-transparent');
                 
-                // 隱藏背景發光，確保播放器與 Notion 底層元件無縫融合
+                // 2. 徹底隱藏並物理刪除背景暈影
                 const auraContainer = document.getElementById('auraContainer');
-                if (auraContainer) auraContainer.style.display = 'none';
+                if (auraContainer) auraContainer.remove();
+
+                // 3. ⚠️【核心安全物理拔除機制】將整個設定面板從網頁 DOM 結構中徹底刪除，100% 根治 Notion 漏字問題
+                const editPanelDOM = document.getElementById('editPanel');
+                if (editPanelDOM) editPanelDOM.remove();
+
+                // 4. 移除 Toast，因為唯讀狀態下不再需要通知
+                const toastDOM = document.getElementById('toast');
+                if (toastDOM) toastDOM.remove();
             } else {
-                // 獨立網頁編輯預覽時，保留高對比底色與炫酷背景霓虹光暈
+                // 獨立網頁端編輯預覽，顯示高質感背景
                 document.body.classList.add('bg-slate-950');
                 document.body.classList.remove('bg-transparent');
-                const auraContainer = document.getElementById('auraContainer');
-                if (auraContainer) auraContainer.style.display = 'block';
             }
 
             if (window.location.hash) {
@@ -644,24 +618,21 @@
                     const rawData = atob(window.location.hash.substring(1));
                     const data = JSON.parse(decodeURIComponent(rawData));
                     
-                    if (data.title) { trackTitle.textContent = data.title; inputTitle.value = data.title; }
-                    if (data.artist) { trackArtist.textContent = data.artist; inputArtist.value = data.artist; }
+                    if (data.title) { trackTitle.textContent = data.title; if(inputTitle) inputTitle.value = data.title; }
+                    if (data.artist) { trackArtist.textContent = data.artist; if(inputArtist) inputArtist.value = data.artist; }
                     
-                    // 恢復主題色彩與唱片色
                     if (data.color && data.vinylColor) {
                         updateColors(data.color, data.vinylColor);
                     } else if (data.color) {
                         updateColors(data.color, data.color);
                     }
 
-                    // 恢復專輯封面
                     if (data.cover) {
                         trackCover.src = data.cover;
-                        previewThumb.src = data.cover;
+                        if(previewThumb) previewThumb.src = data.cover;
                         compressedCoverBase64 = data.cover;
                     }
 
-                    // 智慧音軌加載
                     if (data.audio) {
                         audio.src = data.audio;
                         githubAudioUrl = data.audio;
@@ -669,11 +640,11 @@
                         try {
                             const parsedUrl = new URL(data.audio);
                             const pathParts = parsedUrl.pathname.split('/');
-                            inputAudioFilename.value = pathParts[pathParts.length - 1];
+                            if(inputAudioFilename) inputAudioFilename.value = pathParts[pathParts.length - 1];
                         } catch (err) {}
 
-                        detectedUrlText.textContent = data.audio;
-                        detectedUrlDisplay.classList.remove('hidden');
+                        if(detectedUrlText) detectedUrlText.textContent = data.audio;
+                        if(detectedUrlDisplay) detectedUrlDisplay.classList.remove('hidden');
                         setAudioMode('github');
                     }
                 } catch (e) {
@@ -682,39 +653,41 @@
             }
         }
 
-        // 打包設定資料並複製新連結
-        copyBtn.addEventListener('click', () => {
-            if (currentAudioMode === 'github' && !githubAudioUrl) {
-                showToast("請點擊『自動偵測』按鈕定位您的 GitHub 音檔！", "error");
-                return;
-            }
+        // 打包設定並複製連結
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                if (currentAudioMode === 'github' && !githubAudioUrl) {
+                    showToast("請點擊『自動偵測』按鈕定位您的 GitHub 音檔！", "error");
+                    return;
+                }
 
-            const config = {
-                title: inputTitle.value.trim() || '未命名歌曲',
-                artist: inputArtist.value.trim() || '未知歌手',
-                color: accentColor,
-                vinylColor: vinylColor,
-                cover: compressedCoverBase64 || trackCover.src,
-                audio: currentAudioMode === 'github' ? githubAudioUrl : ''
-            };
+                const config = {
+                    title: inputTitle.value.trim() || '未命名歌曲',
+                    artist: inputArtist.value.trim() || '未知歌手',
+                    color: accentColor,
+                    vinylColor: vinylColor,
+                    cover: compressedCoverBase64 || trackCover.src,
+                    audio: currentAudioMode === 'github' ? githubAudioUrl : ''
+                };
 
-            const jsonStr = encodeURIComponent(JSON.stringify(config));
-            const encrypted = btoa(jsonStr);
-            
-            const baseUrl = window.location.origin + window.location.pathname;
-            const finalUrl = `${baseUrl}?embed=true#${encrypted}`;
+                const jsonStr = encodeURIComponent(JSON.stringify(config));
+                const encrypted = btoa(jsonStr);
+                
+                const baseUrl = window.location.origin + window.location.pathname;
+                const finalUrl = `${baseUrl}?embed=true#${encrypted}`;
 
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(finalUrl).then(() => {
-                    showToast('🎉 水晶播放器連結複製成功！快去 Notion 貼上建立嵌入吧！');
-                    closeSettings();
-                    window.history.replaceState(null, '', finalUrl);
-                    loadUrlParams();
-                }).catch(() => fallbackCopy(finalUrl));
-            } else {
-                fallbackCopy(finalUrl);
-            }
-        });
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(finalUrl).then(() => {
+                        showToast('🎉 水晶播放器連結複製成功！快去 Notion 貼上建立嵌入吧！');
+                        closeSettings();
+                        window.history.replaceState(null, '', finalUrl);
+                        loadUrlParams();
+                    }).catch(() => fallbackCopy(finalUrl));
+                } else {
+                    fallbackCopy(finalUrl);
+                }
+            });
+        }
 
         // 複製 Fallback
         function fallbackCopy(text) {
@@ -731,12 +704,6 @@
                 showToast('複製失敗，請手動複製網址列。', 'error');
             }
         }
-
-        // 初始化
-        window.addEventListener('DOMContentLoaded', loadUrlParams);
-    </script>
-</body>
-</html>
 
         // 初始化
         window.addEventListener('DOMContentLoaded', loadUrlParams);
